@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
+		<style>
+			html, body{
+				margin: 0;
+				padding: 0;
+				color: gainsboro;
+				background-color: rgba(0, 0, 0, 0);
+				overflow: hidden;
+			}
+
+			#content{
+				height: 26em;
+				width: 22em;
+				overflow: hidden;
+			}
+
+			#carriage{
+				height: 26em;
+				width: 22em;
+				position: relative;
+				transition: 1s all ease-in-out;
+			}
+
+			.pulled_down{
+				transform: translateY(14em);
+			}
+
+			.frame{
+				height: 10em;
+				width: 20em;
+				box-shadow: 0 0.05em 0.25em dimgrey;
+				display: grid;
+				place-items: center;
+				border: 0.5em solid whitesmoke;
+				background: gainsboro;
+				padding: 0.25em;
+				position: absolute;
+				left: 1em;
+				bottom: 2em;
+				box-sizing: border-box;
+				transition: 0.75s all ease-in-out;
+			}
+
+			.frame_up{
+				transform: translateY(-110%) rotate(2.5deg);
+			}
+
+			img{
+				max-height: 100%;
+				max-width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="content">
+			<div id="carriage" class="pulled_down">
+
+			</div>
+		</div>
+		<script type="text/javascript">
+			const logos = [
+				'/test_images/pepsi.svg',
+				'/test_images/starbucks.jpg',
+				'/test_images/nike.jpg'
+			];
+
+			const carriage = document.getElementById('carriage');
+			const stack_size = logos.length;
+
+			const TIME_INITIAL_WAIT = 100;
+			const TIME_FRAME_DISPLAY = 2000;
+			const TIME_TRANSITION_SPEED = 1000;
+			const TIME_HIDDEN = 5000;
+			
+			const ROTATION_RANDOM_RANGE = 10;
+
+			function flip_card(){
+				let top_frame = null;
+				const frames = document.getElementsByClassName("frame");
+				let highest_z = null
+				for (var i = 0; i < frames.length; i++){
+					if (highest_z === null || frames[i].style.zIndex > highest_z){
+						top_frame = frames[i];
+						highest_z = frames[i].style.zIndex;
+					}
+				}
+
+				top_frame.classList.add("frame_up");
+				setTimeout(function(){
+					reorder_stack();
+					setTimeout(function(){
+						const rotation = (Math.random()*ROTATION_RANDOM_RANGE-ROTATION_RANDOM_RANGE/2).toFixed(1);
+						top_frame.classList.remove("frame_up");
+						top_frame.style.transform = "rotate("+rotation+"deg)";
+					},TIME_TRANSITION_SPEED*0.2);
+				}, TIME_TRANSITION_SPEED*0.8);
+			}
+
+			function clear_transformations(){
+				const frames = document.getElementsByClassName("frame");
+				for (var i = 0; i < frames.length; i++){
+					frames[i].style.transform = null;
+				}
+			}
+
+			function reorder_stack(){
+				const frames = document.getElementsByClassName("frame");
+				for (var i = 0; i < frames.length; i++){
+					let zindex = frames[i].style.zIndex;
+					frames[i].style.zIndex = ++zindex % 3;
+				}
+			}
+
+			function perform(){
+				carriage.classList.remove("pulled_down");
+				var flip_counter = 0;
+				var cardflip = setInterval(()=>{ // Carriage pulled up
+					if (flip_counter >= stack_size-1){
+						window.clearInterval(cardflip);
+						carriage.classList.add("pulled_down");
+						setTimeout(()=>{
+							reorder_stack();
+							clear_transformations();
+						}, TIME_TRANSITION_SPEED);
+					}else{
+						flip_card();
+						flip_counter++;
+					}
+				}, TIME_TRANSITION_SPEED + TIME_FRAME_DISPLAY);
+			}
+
+			document.addEventListener("DOMContentLoaded", () => {
+				for (var i = 0; i < logos.length; i++){
+					const url = logos[i];
+					const frame = document.createElement('div');
+					frame.style.zIndex = i;
+					frame.classList.add('frame');
+					const img = document.createElement('img');
+					img.setAttribute('src', url);
+					frame.appendChild(img);
+					carriage.appendChild(frame);
+				}
+
+				// display time for each frame + transition between frames + carriage movement up & down + hidden time
+				const time_total_display = stack_size*TIME_FRAME_DISPLAY + (stack_size+1)*TIME_TRANSITION_SPEED + TIME_HIDDEN;
+
+				setTimeout(()=>{
+					perform();
+					setInterval(perform, time_total_display);
+				}, TIME_INITIAL_WAIT);
+			})
+		</script>
+	</body>
+</html>
