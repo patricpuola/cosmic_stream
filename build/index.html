@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
+		<title>Streamcard builder</title>
+		<style>
+			body{
+				font-family: sans-serif;
+				background-color: ghostwhite;
+				display: grid;
+				place-items: center;
+				font-size: 1.5em;
+			}
+
+			#url_build{
+				height: 20em;
+				width: 100%;
+				max-width:50em;
+				resize: none;
+				cursor: pointer;
+			}
+
+			button, select, input, #url_build, #notify{
+				font-size: 1em;
+			}
+
+			button{
+				margin: 0.25em 0em;
+			}
+
+			#notify{
+				margin: 0.25em 0em;
+				transition: 0.2s all ease-in-out;
+				opacity: 0;
+			}
+
+			.setting{
+				margin: 0.5em 0em;
+			}
+
+			.setting div{
+				margin: 0 0.25em;
+				display: inline;
+			}
+
+			.description{
+				font-size: 0.75em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Build a card display</h1>
+		<div id="general_settings"></div>
+		<div id="frames"></div>
+		<button type="button" onclick="frameAdd()">Add Frame</button>
+		<button type="button" onclick="build()">Build</button>
+		<br>
+		<textarea id="url_build" readonly></textarea>
+		<div id="notify"></div>
+		<script type="text/javascript" src="/config.js"></script>
+		<script type="text/javascript">
+			function frameAdd(type = "img", value = null){
+				const container = document.getElementById("frames");
+
+				const div = document.createElement('div');
+				div.classList.add("frame");
+				const type_select = document.createElement("select");
+				type_select.classList.add("type_select");
+				for (var i = 0; i < FRAME_TYPES.length; i++){
+					const option = document.createElement("option");
+					option.value = option.innerHTML = FRAME_TYPES[i];
+					if (type === FRAME_TYPES[i]){
+						option.setAttribute("checked", "checked");
+					}
+					type_select.appendChild(option);
+				}
+				div.appendChild(type_select);
+
+				const text = document.createElement("input");
+				text.type = "text";
+				text.classList.add("frame_text");
+				if (value !== null){
+					text.value = value;
+				}
+				div.appendChild(text);
+
+				const del = document.createElement("button");
+				del.type = "button";
+				del.innerHTML = "Remove";
+				div.appendChild(del);
+
+				container.appendChild(div);
+
+				del.addEventListener('click', function(){
+					this.parentElement.remove();
+				});
+			}
+
+			function notify(msg){
+				const notify_area = document.getElementById("notify");
+				notify_area.innerHTML = msg;
+				notify_area.style.opacity = 1;
+				setTimeout(()=>{
+					notify_area.style.opacity = 0;
+				}, 2000);
+			}
+
+			function build(){
+				const buildarea = document.getElementById("url_build");
+				let url = BASE_URL + "?";
+
+				const settings = [];
+				const setting_els = document.querySelectorAll("div#general_settings div.setting");
+				for (var i = 0; i < setting_els.length; i++){
+					const key = setting_els[i].querySelector(".setting_key").innerText;
+					const value = setting_els[i].querySelector(".setting_value").value;
+					settings.push({key:key, value:value});
+				}
+
+				url += settings.map((i)=>i.key+"="+i.value).join("&");
+
+				const frames = [];
+				const frame_els = document.getElementsByClassName("frame");
+				for (var i = 0; i < frame_els.length; i++){
+					const type = frame_els[i].querySelector("select.type_select").value;
+					const value = frame_els[i].querySelector("input.frame_text").value;
+					frames.push({type:type, value:value});
+				}
+
+				if (url.length > (BASE_URL + "?").length){
+					url += "&";
+				}
+				
+				url += "frames=" + frames.map((i)=>"("+i.type+")"+i.value).join(";");
+				buildarea.value = url;
+			}
+
+			document.addEventListener("DOMContentLoaded", ()=>{
+				const general_settings = document.getElementById("general_settings");
+				for (setting_key in DEFAULT_SETTINGS){
+					const setting = document.createElement("div");
+					setting.classList.add("setting");
+					const key = document.createElement("div");
+					key.classList.add("setting_key");
+					key.innerHTML = setting_key;
+					const value = document.createElement("input");
+					value.classList.add("setting_value");
+					value.type = "text";
+					value.value = DEFAULT_SETTINGS[setting_key];
+					const desc = document.createElement("div");
+					desc.classList.add("description");
+					desc.innerHTML = SETTINGS_HELP[setting_key];
+					setting.appendChild(key);
+					setting.appendChild(value);
+					setting.appendChild(document.createElement('br'));
+					setting.appendChild(desc);
+					general_settings.appendChild(setting);
+				}
+
+				for (var i = 0; i < PLACEHOLDER_FRAMES.length; i++){
+					frameAdd(PLACEHOLDER_FRAMES[i].type, PLACEHOLDER_FRAMES[i].value);
+				}
+
+				document.getElementById("url_build").addEventListener('click', function(){
+					this.select();
+					this.setSelectionRange(0, 99999);
+					document.execCommand("copy");
+					notify("Copied!");
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -13,30 +13,31 @@
 			}
 
 			#content{
-				height: 26em;
-				width: 22em;
+				height: 52em;
+				width: 44em;
 				overflow: hidden;
 			}
 
 			#carriage{
-				height: 26em;
-				width: 22em;
+				height: 52em;
+				width: 44em;
 				position: relative;
 				transition: 1s all ease-in-out;
 			}
 
 			.pulled_down{
-				transform: translateY(14em);
+				transform: translateY(28em);
 			}
 
 			.frame{
-				height: 10em;
-				width: 20em;
-				box-shadow: 0 0.05em 0.25em dimgrey;
-				display: grid;
+				height: 20em;
+				width: 40em;
+				box-shadow: 0 0.05em 0.25em #222222, 0 0.05em 0.25em grey inset;
+				display: flex;
 				place-items: center;
-				border: 0.5em solid whitesmoke;
-				background: gainsboro;
+				justify-content: space-around;
+				border: 0.5em solid rgb(248, 238, 238);
+				background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
 				padding: 0.25em;
 				position: absolute;
 				left: 1em;
@@ -58,25 +59,22 @@
 	<body>
 		<div id="content">
 			<div id="carriage" class="pulled_down">
-
+				<!-- Frames go here -->
 			</div>
 		</div>
+		<script type="text/javascript" src="/config.js"></script>
 		<script type="text/javascript">
-			const logos = [
-				'/test_images/pepsi.svg',
-				'/test_images/starbucks.jpg',
-				'/test_images/nike.jpg'
-			];
-
 			const carriage = document.getElementById('carriage');
-			const stack_size = logos.length;
-
-			const TIME_INITIAL_WAIT = 100;
-			const TIME_FRAME_DISPLAY = 2000;
-			const TIME_TRANSITION_SPEED = 1000;
-			const TIME_HIDDEN = 5000;
 			
-			const ROTATION_RANDOM_RANGE = 10;
+			// Settings to be overwritten
+			const SETTINGS = {};
+			SETTINGS['frames'] = PLACEHOLDER_FRAMES;
+			SETTINGS['stack_size'] = PLACEHOLDER_FRAMES.length;
+			SETTINGS['display'] = DEFAULT_SETTINGS['display'];
+			SETTINGS['pause'] = DEFAULT_SETTINGS['pause'];
+			SETTINGS['initial_wait'] = 100;
+			SETTINGS['transition_duration'] = 1000;
+			SETTINGS['disperse_deg'] = 10;
 
 			function flip_card(){
 				let top_frame = null;
@@ -93,11 +91,11 @@
 				setTimeout(function(){
 					reorder_stack();
 					setTimeout(function(){
-						const rotation = (Math.random()*ROTATION_RANDOM_RANGE-ROTATION_RANDOM_RANGE/2).toFixed(1);
+						const rotation = (Math.random()*SETTINGS['disperse_deg']-SETTINGS['disperse_deg']/2).toFixed(1);
 						top_frame.classList.remove("frame_up");
 						top_frame.style.transform = "rotate("+rotation+"deg)";
-					},TIME_TRANSITION_SPEED*0.2);
-				}, TIME_TRANSITION_SPEED*0.8);
+					},SETTINGS['transition_duration']*0.2);
+				}, SETTINGS['transition_duration']*0.8);
 			}
 
 			function clear_transformations(){
@@ -116,26 +114,61 @@
 			}
 
 			function perform(){
+				console.log(SETTINGS);
 				carriage.classList.remove("pulled_down");
 				var flip_counter = 0;
 				var cardflip = setInterval(()=>{ // Carriage pulled up
-					if (flip_counter >= stack_size-1){
+					if (flip_counter >= SETTINGS['stack_size']-1){
 						window.clearInterval(cardflip);
 						carriage.classList.add("pulled_down");
 						setTimeout(()=>{
 							reorder_stack();
 							clear_transformations();
-						}, TIME_TRANSITION_SPEED);
+						}, SETTINGS['transition_duration']);
 					}else{
 						flip_card();
 						flip_counter++;
 					}
-				}, TIME_TRANSITION_SPEED + TIME_FRAME_DISPLAY);
+				}, SETTINGS['transition_duration'] + SETTINGS['display']);
 			}
 
 			document.addEventListener("DOMContentLoaded", () => {
-				for (var i = 0; i < logos.length; i++){
-					const url = logos[i];
+				const frames = [];
+				const get_params = window.location.href.split(/\?(.+)/)[1];
+				if (typeof get_params != 'undefined'){
+					let [settings_ar, frames_ar] = get_params.split(/frames=(.+)/);
+					
+					settings_ar = settings_ar.split("&").filter((el) => { return el.length > 0 });
+					for (var i = 0; i < settings_ar.length; i++){
+						const [key, value] = settings_ar[i].split("=");
+						if (value.match(/^\d+$/)){
+							SETTINGS[key] = parseInt(value);
+						}else{
+							SETTINGS[key] = value;
+						}
+					}
+
+					if (typeof frames_ar != 'undefined'){
+						frames_ar = frames_ar.split(";");
+						for (var i = 0; i < frames_ar.length; i++){
+							const [empty, type, value] = frames_ar[i].split(/\(([^\)]+)\)/);
+							frames.push({type:type, value:value});
+						}
+					}
+
+					console.log(frames);
+
+					console.log(SETTINGS);
+					console.log(frames_ar);
+
+					if (frames.length > 0){
+						SETTINGS['frames'] = frames;
+						SETTINGS['stack_size'] = frames.length;
+					}
+				}
+
+				for (var i = 0; i < SETTINGS['frames'].length; i++){
+					const url = SETTINGS['frames'][i].value;
 					const frame = document.createElement('div');
 					frame.style.zIndex = i;
 					frame.classList.add('frame');
@@ -143,15 +176,15 @@
 					img.setAttribute('src', url);
 					frame.appendChild(img);
 					carriage.appendChild(frame);
-				}
+				}				
 
 				// display time for each frame + transition between frames + carriage movement up & down + hidden time
-				const time_total_display = stack_size*TIME_FRAME_DISPLAY + (stack_size+1)*TIME_TRANSITION_SPEED + TIME_HIDDEN;
+				const time_total_display = SETTINGS['stack_size']*SETTINGS['display'] + (SETTINGS['stack_size']+1)*SETTINGS['transition_duration'] + SETTINGS['pause'];
 
 				setTimeout(()=>{
 					perform();
 					setInterval(perform, time_total_display);
-				}, TIME_INITIAL_WAIT);
+				}, SETTINGS['initial_wait']);
 			})
 		</script>
 	</body>
