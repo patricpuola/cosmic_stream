@@ -18,7 +18,7 @@ const DEFAULT_SETTINGS = {
 const SETTINGS_HELP = {
 	'pause':"Time in ms card stack stays hidden between displays",
 	'display':"Time in ms to show each card",
-	'disperse_deg': "Card dispersion in +/- deg when shuffled to the back",
+	'disperse_deg': "Card dispersion in +/- deg",
 	'style': "Transition style from one card to another"
 }
 
