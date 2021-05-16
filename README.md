@@ -7,5 +7,5 @@ Use the /build tool to setup a display.
 
 You can also omit all parameters to use default placeholders and settings.
 
-https://patricpuola.github.io/cosmic_stream/
-https://patricpuola.github.io/cosmic_stream/build
+- https://patricpuola.github.io/cosmic_stream/
+- https://patricpuola.github.io/cosmic_stream/build
