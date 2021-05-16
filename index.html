@@ -117,7 +117,6 @@
 			}
 
 			function perform(){
-				console.log(SETTINGS);
 				carriage.classList.remove("pulled_down");
 				var flip_counter = 0;
 				var cardflip = setInterval(()=>{ // Carriage pulled up
@@ -158,11 +157,6 @@
 							frames.push({type:type, value:value});
 						}
 					}
-
-					console.log(frames);
-
-					console.log(SETTINGS);
-					console.log(frames_ar);
 
 					if (frames.length > 0){
 						SETTINGS['frames'] = frames;
