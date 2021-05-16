@@ -13,8 +13,7 @@ const SETTINGS_HELP = {
 const BASE_URL = window.location.protocol + "//" +window.location.host + window.location.pathname;
 
 const FRAME_TYPES = [
-	'img',
-	'text'
+	'img'
 ];
 
 const PLACEHOLDER_FRAMES = [
