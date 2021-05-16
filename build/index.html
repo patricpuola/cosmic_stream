@@ -60,8 +60,6 @@
 		<div id="notify"></div>
 		<script type="text/javascript" src="../config.js"></script>
 		<script type="text/javascript">
-			const ROOT_URL = BASE_URL.replace("build/", "");
-		
 			function frameAdd(type = "img", value = null){
 
 				const container = document.getElementById("frames");
@@ -111,7 +109,7 @@
 
 			function build(){
 				const buildarea = document.getElementById("url_build");
-				let url = ROOT_URL + "?";
+				let url = BASE_URL + "?";
 
 				const settings = [];
 				const setting_els = document.querySelectorAll("div#general_settings div.setting");
@@ -131,7 +129,7 @@
 					frames.push({type:type, value:value});
 				}
 
-				if (url.length > (ROOT_URL + "?").length){
+				if (url.length > (BASE_URL + "?").length){
 					url += "&";
 				}
 				
