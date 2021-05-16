@@ -1,6 +1,7 @@
 const DEFAULT_SETTINGS = {
 	'pause':5000,
-	'display':2000
+	'display':2000,
+	'disperse_deg':5
 };
 
 const SETTINGS_HELP = {

@@ -72,9 +72,9 @@
 			SETTINGS['stack_size'] = PLACEHOLDER_FRAMES.length;
 			SETTINGS['display'] = DEFAULT_SETTINGS['display'];
 			SETTINGS['pause'] = DEFAULT_SETTINGS['pause'];
-			SETTINGS['initial_wait'] = 100;
+			SETTINGS['disperse_deg'] = DEFAULT_SETTINGS['disperse_deg'];
 			SETTINGS['transition_duration'] = 1000;
-			SETTINGS['disperse_deg'] = 10;
+			SETTINGS['initial_wait'] = 100;
 
 			function flip_card(){
 				let top_frame = null;
@@ -91,9 +91,12 @@
 				setTimeout(function(){
 					reorder_stack();
 					setTimeout(function(){
-						const rotation = (Math.random()*SETTINGS['disperse_deg']-SETTINGS['disperse_deg']/2).toFixed(1);
+						const total_dispersion = SETTINGS['disperse_deg']*2;	// e.g. +10deg => +/-5deg
+						const rotation = (Math.random()*total_dispersion-total_dispersion/2).toFixed(1);
 						top_frame.classList.remove("frame_up");
-						top_frame.style.transform = "rotate("+rotation+"deg)";
+						if (rotation != 0){
+							top_frame.style.transform = "rotate("+rotation+"deg)";
+						}
 					},SETTINGS['transition_duration']*0.2);
 				}, SETTINGS['transition_duration']*0.8);
 			}
@@ -109,7 +112,7 @@
 				const frames = document.getElementsByClassName("frame");
 				for (var i = 0; i < frames.length; i++){
 					let zindex = frames[i].style.zIndex;
-					frames[i].style.zIndex = ++zindex % 3;
+					frames[i].style.zIndex = ++zindex % SETTINGS['stack_size'];
 				}
 			}
 
