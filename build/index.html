@@ -15,6 +15,12 @@
 				font-size: 1.5em;
 			}
 
+			#cont{
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1em;
+			}
+
 			#url_build{
 				height: 20em;
 				width: 100%;
@@ -41,25 +47,61 @@
 				margin: 0.5em 0em;
 			}
 
-			.setting div{
-				margin: 0 0.25em;
-				display: inline;
+				.setting div{
+					margin: 0 0.25em;
+					display: inline;
+				}
+				
+				.description{
+					font-size: 0.75em;
+				}
+
+			.frame{
+				display: grid;
+				gap: 0.5em;
+				grid-template-columns: min-content max-content min-content;
 			}
 
-			.description{
-				font-size: 0.75em;
+			#build_btn{
+				width:100%;
+				line-height: 2em;
 			}
+
+			#preview_cont{
+				position: relative;
+			}
+
+				#preview{
+					height: 26em;
+					width: 22em;
+				}
+
+				#preview_size{
+					position: absolute;
+					top:0;
+					right:0.2em;
+				}
 		</style>
 	</head>
 	<body>
 		<h1>Build a card display</h1>
-		<div id="general_settings"></div>
-		<div id="frames"></div>
-		<button type="button" onclick="frameAdd()">Add Frame</button>
-		<button type="button" onclick="build()">Build</button>
-		<br>
-		<textarea id="url_build" readonly></textarea>
-		<div id="notify"></div>
+		<div id="cont">
+			<div id="general_settings"></div>
+			<div>
+				<div id="frames"></div>
+				<button type="button" onclick="frameAdd()">Add Frame</button>
+				<button type="button" onclick="frameClearAll()">Clear All</button>
+			</div>
+			<div>
+				<button type="button" id="build_btn" onclick="build()">Build</button>
+				<textarea id="url_build" readonly></textarea>
+				<div id="notify"></div>
+			</div>
+			<div id="preview_cont">
+				<div id="preview_size"></div>
+				<iframe id="preview"></iframe>
+			</div>
+		</div>
 		<script type="text/javascript" src="../config.js"></script>
 		<script type="text/javascript">
 			function frameAdd(type = "img", value = null){
@@ -100,6 +142,13 @@
 				});
 			}
 
+			function frameClearAll(){
+				const frame_value_inputs = document.querySelectorAll("input.frame_text");
+				for (var i = 0; i < frame_value_inputs.length; i++){
+					frame_value_inputs[i].value = "";
+				}
+			}
+
 			// fade a notification message in & out
 			function notify(msg){
 				const notify_area = document.getElementById("notify");
@@ -131,6 +180,7 @@
 					const value = frame_els[i].querySelector("input.frame_text").value;
 					frames.push({type:type, value:value});
 				}
+				frames.reverse();
 
 				if (url.length > (BASE_URL + "?").length){
 					url += "&";
@@ -138,6 +188,15 @@
 				
 				url += "frames=" + frames.map((f)=>"("+f.type+")"+encodeURI(f.value)).join(";");
 				buildarea.value = url;
+
+				document.getElementById("preview").src = url;
+				updatePreviewSize();
+			}
+
+			function updatePreviewSize(){
+				const preview_size = document.getElementById("preview").getBoundingClientRect();
+				const size_display = preview_size.width + " x " + preview_size.height;
+				document.getElementById("preview_size").innerHTML = size_display;
 			}
 
 			document.addEventListener("DOMContentLoaded", ()=>{
