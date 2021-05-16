@@ -207,10 +207,26 @@
 					const key = document.createElement("div");
 					key.classList.add("setting_key");
 					key.innerHTML = setting_key;
-					const value = document.createElement("input");
-					value.classList.add("setting_value");
-					value.type = "text";
-					value.value = DEFAULT_SETTINGS[setting_key];
+					let value;
+					if (typeof SETTINGS_TYPE[setting_key] == 'object'){
+						value = document.createElement('select');
+						value.classList.add("setting_value");
+						for (var i = 0; i < SETTINGS_TYPE[setting_key].length; i++){
+							const option = document.createElement('option');
+							option.value = SETTINGS_TYPE[setting_key][i];
+							option.innerHTML = SETTINGS_TYPE[setting_key][i];
+							value.appendChild(option);
+						}
+					}else{
+						value = document.createElement("input");
+						value.classList.add("setting_value");
+						let type = "text";
+						if (typeof SETTINGS_TYPE[setting_key] != 'undefined' && SETTINGS_TYPE[setting_key] == 'number'){
+							type = "number";
+						}
+						value.type = type;
+						value.value = DEFAULT_SETTINGS[setting_key];
+					}
 					const desc = document.createElement("div");
 					desc.classList.add("description");
 					desc.innerHTML = SETTINGS_HELP[setting_key];

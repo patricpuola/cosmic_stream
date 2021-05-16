@@ -49,7 +49,7 @@
 				transition: 0.75s all ease-in-out;
 			}
 
-			.frame_up{
+			.shuffle_up{
 				transform: translateY(-110%) rotate(2.5deg);
 			}
 
@@ -83,6 +83,7 @@
 			SETTINGS['display'] = DEFAULT_SETTINGS['display'];
 			SETTINGS['pause'] = DEFAULT_SETTINGS['pause'];
 			SETTINGS['disperse_deg'] = DEFAULT_SETTINGS['disperse_deg'];
+			SETTINGS['style'] = DEFAULT_SETTINGS['style'];
 			SETTINGS['transition_duration'] = 1000;
 			SETTINGS['initial_wait'] = 100;
 
@@ -97,21 +98,34 @@
 					}
 				}
 
+				const style = SETTINGS['style'];
+
 				if (top_frame !== null){
-					top_frame.classList.add("frame_up");
-					setTimeout(function(){
-						reorder_stack();
+					// e.g. 5deg => +/-5deg
+					const total_dispersion = SETTINGS['disperse_deg']*2;
+					const rotation = (Math.random()*total_dispersion-total_dispersion/2).toFixed(1);
+					
+					if (style == 'shuffle'){
+						top_frame.classList.add("shuffle_up");
 						setTimeout(function(){
-							// e.g. 5deg => +/-5deg
-							const total_dispersion = SETTINGS['disperse_deg']*2;
-							const rotation = (Math.random()*total_dispersion-total_dispersion/2).toFixed(1);
-							
-							top_frame.classList.remove("frame_up");
-							if (rotation != 0){
-								top_frame.style.transform = "rotate("+rotation+"deg)";
-							}
-						},SETTINGS['transition_duration']*0.2);
-					}, SETTINGS['transition_duration']*0.8);
+							reorder_stack();
+							setTimeout(function(){
+								top_frame.classList.remove("shuffle_up");
+								if (rotation != 0){
+									top_frame.style.transform = "rotate("+rotation+"deg)";
+								}
+							},SETTINGS['transition_duration']*0.2);
+						}, SETTINGS['transition_duration']*0.8);
+					}else if (style == 'toss'){
+						let transform = "translateY(200%)";
+						if (rotation != 0){
+							 transform += " rotate("+rotation+"deg)";
+						}
+						top_frame.style.transform = transform;
+						setTimeout(function(){
+							reorder_stack();
+						}, SETTINGS['transition_duration']);
+					}
 				}
 			}
 
@@ -133,12 +147,16 @@
 			function perform(){
 				carriage.classList.remove("pulled_down");
 				var flip_counter = 0;
+				const limit = SETTINGS['style'] == 'shuffle' ? SETTINGS['stack_size']-1 : SETTINGS['stack_size'];
+				const reorders_needed = SETTINGS['stack_size'] - limit;
 				var cardflip = setInterval(()=>{ // Carriage pulled up
-					if (flip_counter >= SETTINGS['stack_size']-1){
+					if (flip_counter >= limit){
 						window.clearInterval(cardflip);
 						carriage.classList.add("pulled_down");
 						setTimeout(()=>{
-							reorder_stack();
+							for (var i = 0; i < reorders_needed; i++){
+								reorder_stack();
+							}
 							clear_transformations();
 						}, SETTINGS['transition_duration']);
 					}else{
