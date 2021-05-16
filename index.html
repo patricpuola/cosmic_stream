@@ -10,7 +10,7 @@
 				font-family: 'Prompt', sans-serif;
 				margin: 0;
 				padding: 0;
-				color: gainsboro;
+				color: dimgray;
 				background-color: rgba(0, 0, 0, 0);
 				overflow: hidden;
 			}
@@ -56,6 +56,13 @@
 			img{
 				max-height: 100%;
 				max-width: 100%;
+			}
+
+			.frame_text{
+				max-width: 100%;
+				text-align: center;
+				font-size: 3em;
+				word-break: break-word;
 			}
 		</style>
 	</head>
@@ -163,7 +170,7 @@
 						frames_ar = frames_ar.split(";");
 						for (var i = 0; i < frames_ar.length; i++){
 							const [empty, type, value] = frames_ar[i].split(/\(([^\)]+)\)/);
-							frames.push({type:type, value:value});
+							frames.push({type:type, value:decodeURI(value)});
 						}
 					}
 
@@ -175,14 +182,22 @@
 
 				// create frame elements
 				for (var i = 0; i < SETTINGS['frames'].length; i++){
-					const url = SETTINGS['frames'][i].value;
-					const frame = document.createElement('div');
-					frame.style.zIndex = i;
-					frame.classList.add('frame');
-					const img = document.createElement('img');
-					img.setAttribute('src', url);
-					frame.appendChild(img);
-					carriage.appendChild(frame);
+						const type = SETTINGS['frames'][i].type;
+						const value = SETTINGS['frames'][i].value;
+						const frame = document.createElement('div');
+						frame.style.zIndex = i;
+						frame.classList.add('frame');
+						if (type == 'img'){
+							const img = document.createElement('img');
+							img.setAttribute('src', value);
+							frame.appendChild(img);
+						}else if (type == 'text'){
+							const div = document.createElement('div');
+							div.classList.add("frame_text");
+							div.innerHTML = value;
+							frame.appendChild(div);
+						}
+						carriage.appendChild(frame);
 				}				
 
 				// display time for each frame + transition between frames + carriage movement up & down + hidden time
