@@ -10,7 +10,7 @@ const SETTINGS_HELP = {
 	'disperse_deg': "Card dispersion in +/- deg when shuffled to the back"
 }
 
-const BASE_URL = window.location.protocol + "//" +window.location.host;
+const BASE_URL = window.location.protocol + "//" +window.location.host + window.location.pathname;
 
 const FRAME_TYPES = [
 	'img',
@@ -18,7 +18,7 @@ const FRAME_TYPES = [
 ];
 
 const PLACEHOLDER_FRAMES = [
-	{'type':'img', 'value':BASE_URL+'/placeholders/pies.png'},
-	{'type':'img', 'value':BASE_URL+'/placeholders/md.png'},
-	{'type':'img', 'value':BASE_URL+'/placeholders/beer.png'}
+	{'type':'img', 'value':BASE_URL+'placeholders/pies.png'},
+	{'type':'img', 'value':BASE_URL+'placeholders/md.png'},
+	{'type':'img', 'value':BASE_URL+'placeholders/beer.png'}
 ];
