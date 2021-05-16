@@ -176,6 +176,10 @@
 					settings_ar = settings_ar.split("&").filter((el) => { return el.length > 0 });
 					for (var i = 0; i < settings_ar.length; i++){
 						const [key, value] = settings_ar[i].split("=");
+						if (key == 'style' && !FLIP_STYLES.contains(value)){
+							continue;
+						}
+						
 						if (value.match(/^\d+$/)){
 							SETTINGS[key] = parseInt(value);
 						}else{
