@@ -5,8 +5,10 @@
 		<meta charset="UTF-8">
 		<title>Streamcard builder</title>
 		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+
 			body{
-				font-family: sans-serif;
+				font-family: 'Prompt', sans-serif;
 				background-color: ghostwhite;
 				display: grid;
 				place-items: center;
@@ -98,6 +100,7 @@
 				});
 			}
 
+			// fade a notification message in & out
 			function notify(msg){
 				const notify_area = document.getElementById("notify");
 				notify_area.innerHTML = msg;
@@ -133,7 +136,7 @@
 					url += "&";
 				}
 				
-				url += "frames=" + frames.map((i)=>"("+i.type+")"+i.value).join(";");
+				url += "frames=" + frames.map((f)=>"("+f.type+")"+encodeURI(f.value)).join(";");
 				buildarea.value = url;
 			}
 

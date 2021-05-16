@@ -10,10 +10,11 @@ const SETTINGS_HELP = {
 	'disperse_deg': "Card dispersion in +/- deg when shuffled to the back"
 }
 
-const BASE_URL = window.location.protocol + "//" +window.location.host + window.location.pathname.replace("build/", "");
+const BASE_URL = window.location.protocol + "//" + window.location.host + window.location.pathname.replace("build/", "");
 
 const FRAME_TYPES = [
-	'img'
+	'img',
+	'text'
 ];
 
 const PLACEHOLDER_FRAMES = [
